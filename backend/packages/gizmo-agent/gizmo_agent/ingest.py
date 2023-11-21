@@ -1,20 +1,18 @@
 import os
+from dotenv import load_dotenv
 
 from agent_executor.upload import IngestRunnable
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.schema.runnable import ConfigurableField
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores.redis import Redis
+from langchain.vectorstores.chroma import Chroma
+
+load_dotenv()
 
 index_schema = {
     "tag": [{"name": "namespace"}],
 }
-vstore = Redis(
-    redis_url=os.environ["REDIS_URL"],
-    index_name="opengpts",
-    embedding=OpenAIEmbeddings(),
-    index_schema=index_schema,
-)
+vstore = Chroma("opengpts", OpenAIEmbeddings(), "backend/vstore")
 
 
 ingest_runnable = IngestRunnable(
